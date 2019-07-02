@@ -5,6 +5,9 @@ from apps.web.validators import json_field_validator
 
 from .abstract import TimeStampModel
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 class Chat(TimeStampModel):
     PRIVATE = 'private'
@@ -74,18 +77,19 @@ class Chat(TimeStampModel):
     no_notifications = models.NullBooleanField(
         verbose_name=_('Disable notifications'),
         null=True,
-        blank=False,
+        default=False,
     )
     no_links_preview = models.NullBooleanField(
         verbose_name=_('Disable links preview'),
         null=True,
-        blank=False,
+        default=False,
     )
     template_context = models.TextField(
         verbose_name=_('Template context'),
         max_length=3000,
         null=True,
         blank=True,
+        default='{}',
         validators=[json_field_validator],
     )
 
@@ -95,4 +99,6 @@ class Chat(TimeStampModel):
 
     def __str__(self):
         """Represent chat name"""
-        return ' | '.join([str(self.id), self.username])
+        if (self.username is not None):
+            return ' | '.join([str(self.id), self.username])
+        return ' | '.join([str(self.id), self.title])
