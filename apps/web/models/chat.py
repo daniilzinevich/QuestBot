@@ -71,11 +71,15 @@ class Chat(TimeStampModel):
 
     # chat settings
 
-    no_notifications = models.BooleanField(
-        verbose_name=_('Disable notifications')
+    no_notifications = models.NullBooleanField(
+        verbose_name=_('Disable notifications'),
+        null=True,
+        blank=False,
     )
-    no_links_preview = models.BooleanField(
-        verbose_name=_('Disable links preview')
+    no_links_preview = models.NullBooleanField(
+        verbose_name=_('Disable links preview'),
+        null=True,
+        blank=False,
     )
     template_context = models.TextField(
         verbose_name=_('Template context'),

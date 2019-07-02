@@ -6,6 +6,7 @@ from django.utils.translation import ugettext_lazy as _
 from apps.web.custom_eval import eval as custom_eval
 from apps.web.models.constants import HookActions
 from apps.web.models.update import Update
+from apps.web.models.chat import Chat
 from apps.web.tasks import send_message_task
 from apps.web.validators import condition_validator
 
@@ -85,7 +86,7 @@ class Handler(TimeStampModel):
 
     def redirect_message(self, bot, chat, message):
         for user in list(self.redirects.all()):
-            chat = chat.objects.filter(username__iexact=user.username).first()
+            chat = Chat.objects.filter(username__iexact=user.username).first()
 
             fmtd_text = """
             Bot: {bot}\nChat: {chat}\nMessage ID: {message}\nText: {text}\n
