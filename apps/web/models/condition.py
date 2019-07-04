@@ -1,5 +1,6 @@
 import re
 from datetime import datetime
+import uuid
 
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
@@ -21,6 +22,7 @@ CONTAIN_AN_AUDIO = 'contain_an_audio'
 CONTAIN_A_VIDEO = 'contain_a_video'
 RECEIVED_BEFORE = 'received_before'
 RECEIVED_AFTER = 'received_after'
+QR_CODE = 'qr_code'
 
 
 RULE_CHOICES = (
@@ -36,6 +38,7 @@ RULE_CHOICES = (
     (CONTAIN_A_VIDEO, _('Contain a video')),
     (RECEIVED_BEFORE, _('Received before')),
     (RECEIVED_AFTER, _('Received after')),
+    (QR_CODE, _('QR code')),
 )
 
 ANY_MESSAGE = 'any_message'
@@ -52,7 +55,10 @@ FIELD_CHOICES = (
 
 
 class Condition(TimeStampModel):
-    value = models.CharField(verbose_name='Answer or pattern', max_length=1000)
+    value = models.CharField(
+        verbose_name='Answer or pattern',
+        max_length=1000,
+    )
     rule = models.CharField(
         verbose_name='Pattern',
         max_length=255,
@@ -71,6 +77,7 @@ class Condition(TimeStampModel):
         related_name='conditions',
         on_delete=models.CASCADE,
     )
+
 
     def __str__(self):
         return f'{self.rule}'
@@ -95,7 +102,7 @@ class Condition(TimeStampModel):
         msg_text = msg.strip().lower()
         value = self.value.lower()
 
-        if self.rule == FULL_COINCIDENCE:
+        if self.rule == FULL_COINCIDENCE or self.rule == QR_CODE:
             return msg_text == value
         elif self.rule == TO_BE_IN:
             return msg_text in value

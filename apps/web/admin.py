@@ -1,5 +1,10 @@
+import qrcode
+import base64
+from io import BytesIO
+
 from django.contrib import admin
 from django.db import models
+from django.utils.html import mark_safe
 
 from ckeditor.widgets import CKEditorWidget
 
@@ -19,6 +24,8 @@ from apps.web.models import (
     Update,
 )
 
+from apps.web.models.condition import QR_CODE
+from apps.web.forms import ConditionForm
 
 class StepInline(admin.TabularInline):
     model = Step
@@ -68,6 +75,7 @@ class HandlerInline(admin.TabularInline):
 
 class ConditionInline(admin.TabularInline):
     model = Condition
+    form = ConditionForm
     readonly_fields = ('id',)
     fields = ('id', 'value', 'matched_field', 'rule',)
 
@@ -114,7 +122,8 @@ class QuestAdmin(admin.ModelAdmin):
 
 @admin.register(Condition)
 class ConditionAdmin(admin.ModelAdmin):
-    readonly_fields = ('created', 'modified')
+    form = ConditionForm
+    readonly_fields = ('created', 'modified', 'qr_code')
     fieldsets = (
         (None, {
             'fields': (
@@ -122,6 +131,7 @@ class ConditionAdmin(admin.ModelAdmin):
                 'value',
                 'created',
                 'modified',
+                'qr_code'
             ),
         }),
         ('Handler', {
@@ -130,6 +140,16 @@ class ConditionAdmin(admin.ModelAdmin):
             )
         }),
     )
+
+    def qr_code(self, obj):
+        if obj.rule == QR_CODE:
+            image = qrcode.make('https://telegram.me/share/url?url={}'.format(obj.value))
+            buffered = BytesIO()
+            image.get_image().save(buffered, format="PNG")
+            return mark_safe(u'<img src="data:image/png;base64,{}"/>'.format(
+                base64.b64encode(buffered.getvalue()).decode()
+            ))
+        return None
 
 
 @admin.register(Handler)
