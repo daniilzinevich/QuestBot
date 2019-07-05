@@ -4,10 +4,6 @@ from django import forms
 
 from apps.web.models.condition import QR_CODE
 
-import logging
-
-logger = logging.getLogger(__name__)
-
 class ConditionForm(forms.ModelForm):
     class Meta:
         model = Condition
@@ -21,5 +17,4 @@ class ConditionForm(forms.ModelForm):
             self.cleaned_data['value'] = uuid.uuid4().hex
             del self.errors['value']
 
-        logging.warning(self.cleaned_data)
         return self.cleaned_data
