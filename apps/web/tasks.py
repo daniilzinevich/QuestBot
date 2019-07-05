@@ -5,6 +5,7 @@ from celery import shared_task
 from apps.web.models.bot import Bot
 from apps.web.models.update import Update
 from apps.web.models.user import AppUser
+from apps.web.models.session import Session
 
 
 @shared_task
@@ -15,10 +16,17 @@ def handle_message_task(update_id: int):
     chat = update.get_message.chat
     message = update.get_message
 
-    if not user.step:
-        bot.quest.initialize_user(user)
+    if not user.current_session:
+        user.current_session, _ = Session.objects.get_or_create(
+            user=user,
+            created=message.date
+        )
+        user.save()
 
-    step = user.step
+    session = user.current_session
+    if not session.step:
+        bot.quest.initialize_user(user)
+    step = session.step
     handlers = step.handlers.filter(enabled_on=update.action_type)
 
     for handler in handlers:
@@ -34,8 +42,8 @@ def handle_message_task(update_id: int):
             next_step = handler.step_on_error
 
         if next_step:
-            user.step = next_step
-            user.save()
+            session.step = next_step
+            session.save()
 
         responses.send_response(bot, chat, message)
 

@@ -10,10 +10,10 @@ class AppUser(AbstractUser):
         max_length=255,
     )
     is_bot = models.BooleanField(verbose_name='User is a bot', default=False)
-    step = models.ForeignKey(
-        to='Step',
-        related_name='users',
-        verbose_name="User's level",
+    current_session = models.ForeignKey(
+        to='Session',
+        related_name='sessions',
+        verbose_name="User's current session",
         blank=True,
         null=True,
         on_delete=models.CASCADE,

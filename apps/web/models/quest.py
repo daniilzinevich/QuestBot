@@ -28,5 +28,6 @@ class Quest(TimeStampModel):
         Add one unique step with active ``is_initial`` flag
 
         """
-        user.step = self.steps.initial()
-        user.save()
+        session = user.current_session
+        session.step = self.steps.initial()
+        session.save()

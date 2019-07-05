@@ -20,12 +20,17 @@ from apps.web.models import (
     Photo,
     Quest,
     Response,
+    Session,
     Step,
     Update,
 )
 
 from apps.web.models.condition import QR_CODE
 from apps.web.forms import ConditionForm
+
+class SessionInline(admin.TabularInline):
+    model = Session
+
 
 class StepInline(admin.TabularInline):
     model = Step
@@ -199,6 +204,18 @@ class ResponseAdmin(admin.ModelAdmin):
         return obj.handler.step.number if obj.handler else None
 
 
+@admin.register(Session)
+class SessionAdmin(admin.ModelAdmin):
+    list_display = ('created', 'user',)
+    readonly_fields = ('created', 'modified')
+    fields = (
+        'created',
+        'modified',
+        'user',
+        'step',
+    )
+
+
 @admin.register(Step)
 class StepAdmin(admin.ModelAdmin):
     inlines = (HandlerInline,)
@@ -210,9 +227,8 @@ class StepAdmin(admin.ModelAdmin):
 class AppUserAdmin(admin.ModelAdmin):
     exclude = ('groups',)
     readonly_fields = ('password', 'last_login')
-    list_display = ('username', 'email', 'device_uid', 'is_staff', 'step')
+    list_display = ('username', 'email', 'device_uid', 'is_staff', 'current_session')
     list_filter = (
-        'step__number',
         ('is_staff', admin.BooleanFieldListFilter),
     )
 
@@ -222,7 +238,7 @@ class AppUserAdmin(admin.ModelAdmin):
                 'username',
                 'first_name',
                 'last_name',
-                'step',
+                'current_session',
                 'email',
                 'device_uid',
             )

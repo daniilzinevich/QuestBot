@@ -2,6 +2,7 @@ from .events import Event
 from .quest import Quest
 from .handler import Handler
 from .response import Response
+from .session import Session
 from .step import Step
 from .user import AppUser
 from .condition import Condition
@@ -18,6 +19,7 @@ __all__ = (
     'Quest',
     'Handler',
     'Response',
+    'Session',
     'Step',
     'AppUser',
     'Condition',
