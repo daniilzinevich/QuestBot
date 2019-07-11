@@ -128,6 +128,8 @@ class QuestAdmin(admin.ModelAdmin):
 @admin.register(Condition)
 class ConditionAdmin(admin.ModelAdmin):
     form = ConditionForm
+    list_display = ('rule', 'quest', 'handler', 'qr_code')
+    list_filter = ('rule', )
     readonly_fields = ('created', 'modified', 'qr_code')
     fieldsets = (
         (None, {
@@ -146,12 +148,15 @@ class ConditionAdmin(admin.ModelAdmin):
         }),
     )
 
+    def quest(self, obj):
+        return obj.handler.step.quest
+
     def qr_code(self, obj):
         if obj.rule == QR_CODE:
             image = qrcode.make('https://telegram.me/share/url?url={}'.format(obj.value))
             buffered = BytesIO()
             image.get_image().save(buffered, format="PNG")
-            return mark_safe(u'<img src="data:image/png;base64,{}"/>'.format(
+            return mark_safe(u'<img src="data:image/png;base64,{}" style="max-width: 200px;"/>'.format(
                 base64.b64encode(buffered.getvalue()).decode()
             ))
         return None
